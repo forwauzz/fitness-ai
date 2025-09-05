@@ -1,0 +1,16 @@
+{
+  "saved_at": "2025-09-05 12:07:21",
+  "model_path": "C:\\Users\\alici\\Desktop\\fitness_ai_coach\\models\\model_xgb.pkl",
+  "n_samples": 15,
+  "cv_note": "holdout 25%",
+  "metrics": {
+    "r2": 0.719459911097604,
+    "mae": 81.63467987368222
+  },
+  "schema": [
+    "protein_g",
+    "carbs_g",
+    "fat_g"
+  ],
+  "label": "calories_kcal (real or synthetic via 4/4/9)"
+}

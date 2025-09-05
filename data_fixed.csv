@@ -1,0 +1,4 @@
+date,entry_type,meal_type,items,quantities,calories_kcal,protein_g,carbs_g,fat_g,workout_type,duration_min,distance_km,goal_type,goal_value,goal_notes,notes
+2025-09-02,meal,dinner,chicken breast and rice,150g chicken 100g rice,450,35,45,15,,,,,,,,
+2025-09-02,meal,snack,mini rice crispies,17g,68,1,13,1,,,,,,,,
+2025-09-03,meal,dinner,sweet potatoes and sausage,100g sweet potato 1 sausage,320,18,35,12,,,,,,,,

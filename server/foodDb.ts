@@ -1,0 +1,66 @@
+export type FoodEntry =
+  | { per: "100g"; P: number; C: number; F: number }
+  | { per: "item" | "scoop" | "tsp" | "tbsp" | "piece" | "link" | "cup" | "250ml"; g_per_item: number; P: number; C: number; F: number };
+
+export const FOOD_DB: Record<string, FoodEntry> = {
+  banana:            { per: "item",  g_per_item: 120, P: 1.3,  C: 27.0, F: 0.3 },
+  "peanut butter":   { per: "tbsp",  g_per_item: 16,  P: 4.0,  C: 3.5,  F: 8.0 },
+  honey:             { per: "tsp",   g_per_item: 7,   P: 0.0,  C: 6.0,  F: 0.0 },
+  eggs:              { per: "item",  g_per_item: 50,  P: 6.3,  C: 0.4,  F: 5.0 },
+  oats:              { per: "100g",                 P: 13.0, C: 68.0, F: 7.0 },
+  yogurt:            { per: "100g",                 P: 6.0,  C: 7.5,  F: 3.0 },
+  "greek yogurt":    { per: "100g",                 P: 10.0, C: 3.6,  F: 0.4 },
+  "whey protein":    { per: "scoop", g_per_item: 30, P: 24.0, C: 3.0,  F: 2.0 },
+  "whey isolate":    { per: "scoop", g_per_item: 30, P: 25.0, C: 1.0,  F: 0.5 },
+  "rice cakes":      { per: "item",  g_per_item: 9,  P: 0.7,  C: 7.3,  F: 0.1 },
+  blueberries:       { per: "100g",                 P: 0.7,  C: 14.5, F: 0.3 },
+  steak:             { per: "100g",                 P: 26.0, C: 0.0,  F: 15.0 },
+  shrimp:            { per: "100g",                 P: 24.0, C: 0.2,  F: 0.3 },
+  pasta:             { per: "100g",                 P: 12.0, C: 75.0, F: 1.5 }, // dry
+  broccoli:          { per: "100g",                 P: 2.8,  C: 7.0,  F: 0.4 },
+  "sweet potatoes":  { per: "100g",                 P: 1.6,  C: 20.0, F: 0.1 },
+  "sweet potato":    { per: "100g",                 P: 1.6,  C: 20.0, F: 0.1 },
+  "mango juice":     { per: "250ml", g_per_item: 250, P: 0.9, C: 33.0, F: 0.3 },
+  cashews:           { per: "100g",                 P: 18.0, C: 30.0, F: 44.0 },
+  sushi:             { per: "piece", g_per_item: 28,  P: 2.0, C: 7.0,  F: 0.4 },
+  sausage:           { per: "link",  g_per_item: 75,  P: 11.0, C: 1.0,  F: 21.0 },
+  "mini rice crispies": { per: "100g",             P: 6.0,  C: 86.0, F: 2.0 },
+  "black coffee":    { per: "cup",   g_per_item: 240, P: 0.0, C: 0.0,  F: 0.0 },
+  "chicken breast":  { per: "100g",                 P: 31.0, C: 0.0,  F: 3.6 },
+  "chicken":         { per: "100g",                 P: 31.0, C: 0.0,  F: 3.6 },
+  rice:              { per: "100g",                 P: 2.7,  C: 28.0, F: 0.3 },
+  "white rice":      { per: "100g",                 P: 2.7,  C: 28.0, F: 0.3 },
+  "brown rice":      { per: "100g",                 P: 2.6,  C: 23.0, F: 0.9 },
+  "olive oil":       { per: "tbsp",  g_per_item: 14,  P: 0.0, C: 0.0,  F: 14.0 },
+  "coconut oil":     { per: "tbsp",  g_per_item: 14,  P: 0.0, C: 0.0,  F: 14.0 },
+  salmon:            { per: "100g",                 P: 25.0, C: 0.0,  F: 13.0 },
+  tuna:              { per: "100g",                 P: 30.0, C: 0.0,  F: 1.0 },
+  "ground beef":     { per: "100g",                 P: 26.0, C: 0.0,  F: 15.0 },
+  turkey:            { per: "100g",                 P: 29.0, C: 0.0,  F: 1.0 },
+  quinoa:            { per: "100g",                 P: 4.4,  C: 22.0, F: 1.9 },
+  "whole wheat bread": { per: "100g",               P: 13.0, C: 41.0, F: 4.2 },
+  avocado:           { per: "100g",                 P: 2.0,  C: 9.0,  F: 15.0 },
+  almonds:           { per: "100g",                 P: 21.0, C: 22.0, F: 50.0 },
+  "almond butter":   { per: "tbsp",  g_per_item: 16,  P: 3.4, C: 3.0,  F: 8.9 },
+  spinach:           { per: "100g",                 P: 2.9,  C: 3.6,  F: 0.4 },
+  "bell pepper":     { per: "100g",                 P: 1.0,  C: 6.0,  F: 0.3 },
+  carrots:           { per: "100g",                 P: 0.9,  C: 10.0, F: 0.2 },
+  apple:             { per: "item",  g_per_item: 182, P: 0.3, C: 25.0, F: 0.2 },
+  orange:            { per: "item",  g_per_item: 140, P: 1.2, C: 21.0, F: 0.1 },
+  grapes:            { per: "100g",                 P: 0.6,  C: 16.0, F: 0.2 }
+};
+
+export const ALIASES: Record<string, string> = {
+  "protein powder": "whey protein",
+  "greek yoghurt": "greek yogurt",
+  yoghurt: "yogurt",
+  potatoes: "sweet potatoes",
+  potato: "sweet potato",
+  "chicken breast": "chicken breast",
+  "chicken thighs": "chicken",
+  "chicken wings": "chicken",
+  "white rice": "rice",
+  "brown rice": "brown rice",
+  "jasmine rice": "rice",
+  "basmati rice": "rice"
+};
