@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k \"npm:dev:*\"",
-    "dev:server": "node --loader ts-node/esm server/index.ts",
+    "dev:server": "tsx server/index.ts",
     "dev:client": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -33,6 +33,7 @@
     "postcss": "^8.5.6",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.4.5",
     "vite": "^5.4.0"
   }
