@@ -71,6 +71,165 @@ app.get("/api/logs", (_req, res) => {
   return res.type("text/csv").send(content);
 });
 
+// Dashboard Analytics API
+app.get("/api/dashboard/analytics", (req, res) => {
+  try {
+    const content = fs.readFileSync(CSV, "utf8");
+    const lines = content.split('\n').filter(line => line.trim());
+    const today = dayjs().format("YYYY-MM-DD");
+    const weekAgo = dayjs().subtract(7, 'day').format("YYYY-MM-DD");
+    
+    // Parse CSV data
+    const data = lines.slice(1).map(line => {
+      const cols = line.split(',');
+      return {
+        date: cols[0],
+        entry_type: cols[1],
+        meal_type: cols[2],
+        calories_kcal: parseFloat(cols[5]) || 0,
+        protein_g: parseFloat(cols[6]) || 0,
+        carbs_g: parseFloat(cols[7]) || 0,
+        fat_g: parseFloat(cols[8]) || 0,
+        workout_type: cols[9],
+        duration_min: parseFloat(cols[10]) || 0,
+        distance_km: parseFloat(cols[11]) || 0,
+        goal_type: cols[12],
+        goal_value: parseFloat(cols[13]) || 0,
+        goal_notes: cols[14],
+        notes: cols[15]
+      };
+    }).filter(row => row.date >= weekAgo);
+
+    // Daily aggregations
+    const dailyData = {};
+    data.forEach(row => {
+      if (!dailyData[row.date]) {
+        dailyData[row.date] = {
+          date: row.date,
+          meals: 0,
+          calories: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
+          workouts: 0,
+          workoutDuration: 0,
+          distance: 0,
+          goals: []
+        };
+      }
+      
+      if (row.entry_type === 'meal' && row.calories_kcal > 0) {
+        dailyData[row.date].meals++;
+        dailyData[row.date].calories += row.calories_kcal;
+        dailyData[row.date].protein += row.protein_g;
+        dailyData[row.date].carbs += row.carbs_g;
+        dailyData[row.date].fat += row.fat_g;
+      }
+      
+      if (row.workout_type && row.duration_min > 0) {
+        dailyData[row.date].workouts++;
+        dailyData[row.date].workoutDuration += row.duration_min;
+        dailyData[row.date].distance += row.distance_km;
+      }
+      
+      if (row.goal_type && row.goal_value > 0) {
+        dailyData[row.date].goals.push({
+          type: row.goal_type,
+          value: row.goal_value,
+          notes: row.goal_notes
+        });
+      }
+    });
+
+    // Weekly totals
+    const weeklyTotals = {
+      totalMeals: 0,
+      totalCalories: 0,
+      totalProtein: 0,
+      totalCarbs: 0,
+      totalFat: 0,
+      totalWorkouts: 0,
+      totalWorkoutDuration: 0,
+      totalDistance: 0,
+      activeDays: Object.keys(dailyData).length
+    };
+
+    Object.values(dailyData).forEach((day: any) => {
+      weeklyTotals.totalMeals += day.meals;
+      weeklyTotals.totalCalories += day.calories;
+      weeklyTotals.totalProtein += day.protein;
+      weeklyTotals.totalCarbs += day.carbs;
+      weeklyTotals.totalFat += day.fat;
+      weeklyTotals.totalWorkouts += day.workouts;
+      weeklyTotals.totalWorkoutDuration += day.workoutDuration;
+      weeklyTotals.totalDistance += day.distance;
+    });
+
+    // Today's data
+    const todayData = dailyData[today] || {
+      date: today,
+      meals: 0,
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      workouts: 0,
+      workoutDuration: 0,
+      distance: 0,
+      goals: []
+    };
+
+    res.json({
+      dailyData: Object.values(dailyData).sort((a: any, b: any) => a.date.localeCompare(b.date)),
+      weeklyTotals,
+      todayData,
+      period: { start: weekAgo, end: today }
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to generate analytics" });
+  }
+});
+
+// Goals API
+app.get("/api/goals", (req, res) => {
+  try {
+    const content = fs.readFileSync(CSV, "utf8");
+    const lines = content.split('\n').filter(line => line.trim());
+    
+    const goals = lines.slice(1).map(line => {
+      const cols = line.split(',');
+      return {
+        date: cols[0],
+        goal_type: cols[12],
+        goal_value: parseFloat(cols[13]) || 0,
+        goal_notes: cols[14]
+      };
+    }).filter(row => row.goal_type && row.goal_value > 0);
+
+    res.json(goals);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch goals" });
+  }
+});
+
+app.post("/api/goals", (req, res) => {
+  try {
+    const { goal_type, goal_value, goal_notes } = req.body;
+    const today = dayjs().format("YYYY-MM-DD");
+    
+    // Add goal to CSV
+    const row = [
+      today, "goal", "", "", "", 0, 0, 0, 0, "", 0, 0, goal_type, goal_value, goal_notes, ""
+    ].map(csvEscape).join(",");
+    
+    fs.appendFileSync(CSV, row + "\n", "utf8");
+    
+    res.json({ success: true, message: "Goal added successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add goal" });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`);

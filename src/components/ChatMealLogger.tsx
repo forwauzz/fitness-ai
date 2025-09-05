@@ -72,7 +72,7 @@ lunch: 180 g shrimp, 129 g pasta, 1 glass mango juice`
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4 pt-8">
       <div className="w-full max-w-4xl mx-auto">
         {/* Main Container */}
         <div className="relative bg-gradient-to-br from-blue-800/20 to-slate-800/30 backdrop-blur-xl border border-blue-400/30 rounded-2xl shadow-2xl shadow-blue-500/20 p-8 md:p-12">
