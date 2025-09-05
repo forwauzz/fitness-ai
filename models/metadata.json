@@ -1,11 +1,11 @@
 {
-  "saved_at": "2025-09-05 12:07:21",
-  "model_path": "C:\\Users\\alici\\Desktop\\fitness_ai_coach\\models\\model_xgb.pkl",
-  "n_samples": 15,
+  "saved_at": "2025-09-05 19:57:52",
+  "model_path": "/workspace/models/model_xgb.pkl",
+  "n_samples": 23,
   "cv_note": "holdout 25%",
   "metrics": {
-    "r2": 0.719459911097604,
-    "mae": 81.63467987368222
+    "r2": 0.8888102909006707,
+    "mae": 22.518554793127503
   },
   "schema": [
     "protein_g",
