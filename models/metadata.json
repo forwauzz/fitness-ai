@@ -1,16 +1,42 @@
 {
-  "saved_at": "2025-09-05 12:07:21",
+  "saved_at": "2025-09-05 22:07:39",
   "model_path": "C:\\Users\\alici\\Desktop\\fitness_ai_coach\\models\\model_xgb.pkl",
-  "n_samples": 15,
+  "n_samples": 18,
   "cv_note": "holdout 25%",
   "metrics": {
-    "r2": 0.719459911097604,
-    "mae": 81.63467987368222
+    "r2": 0.8745085252892333,
+    "mae": 31.615737915039062
   },
   "schema": [
     "protein_g",
     "carbs_g",
-    "fat_g"
+    "fat_g",
+    "has_favorite_food",
+    "has_favorite_snack",
+    "has_grocery_item",
+    "profile_protein_ratio",
+    "profile_carbs_ratio",
+    "profile_fat_ratio",
+    "personalization_score"
   ],
-  "label": "calories_kcal (real or synthetic via 4/4/9)"
+  "label": "calories_kcal (real or synthetic via 4/4/9)",
+  "profile_integration": true,
+  "feature_importance": {
+    "protein_g": 0.3,
+    "carbs_g": 0.35,
+    "fat_g": 0.4,
+    "has_favorite_food": 0.16,
+    "has_favorite_snack": 0.18,
+    "has_grocery_item": 0.1,
+    "profile_protein_ratio": 0.6000000000000001,
+    "profile_carbs_ratio": 0.65,
+    "profile_fat_ratio": 0.7,
+    "personalization_score": 0.14
+  },
+  "training_history": {
+    "total_training_runs": 1,
+    "last_improvement": "2025-09-05 22:07:39",
+    "best_r2": 0.8745085252892333,
+    "best_mae": 31.615737915039062
+  }
 }

@@ -1,0 +1,69 @@
+---
+description:# Surgical Implementation (Global User Rule)
+
+**Intent:** Make the smallest, safest change to solve the specific problem — no refactors, no shortcuts, no scope creep.
+
+## Core Principles
+- **Search before edit.** Read relevant files + recent commits; cite file paths and line ranges before proposing changes.
+- **Minimal diff.** Target ~3–30 lines. Avoid drive-by refactors or file moves.
+- **Plan first.** Propose a short, numbered plan. Execute *exactly* that plan once approved.
+- **Feature flags.** Gate new behavior; default OFF unless specified.
+- **One concern per PR.** Tests + code + docs for a single issue.
+
+## Guardrails
+- **No secrets in code.** Use env vars only. Never log env values.
+- **No API/contract changes** or folder reshuffles unless explicitly requested.
+- **No new dependencies** without: (1) why needed, (2) lighter alternative, (3) lockfile impact.
+- **No unrelated edits.** Don’t “clean up” adjacent code unless asked.
+
+## Quality Gates
+- **Types, lint, unit tests** must pass locally.
+- **Tests added/updated** for the change (happy & unhappy path).
+- Add a **short “Why now / Why this approach”** note in the PR body.
+
+## Git Hygiene
+- **Branch name:** `type/scope-shorttopic` (e.g., `fix/auth-jwks-401`).
+- **Conventional Commits:** `feat|fix|refactor|perf|chore|docs(scope): summary`.
+- Keep commits small; each commit should pass tests locally.
+
+## SHIPLOG
+- Maintain `docs/SHIPLOG.md`.  
+- On each qualifying commit (`feat|fix|refactor|perf`), append:  
+  `YYYY-MM-DD HH:mm — [branch] type(scope): summary — commit:<shortsha>`
+
+## Retry Policy
+- If the same issue fails after **3 attempts**:
+  - **STOP** coding.  
+  - Create `/docs/contextual_summary.md` with problem, logs, attempts, constraints, suspected causes, narrow fix proposal.  
+  - Update PR’s **Attempt Log** and request human review.
+
+## Task Protocol
+**Before coding**  
+1) Confirm acceptance criteria  
+2) List impacted files + why  
+3) Propose a minimal 3–6 step plan  
+4) State tests to add/update  
+
+**During coding**  
+- Keep diffs minimal  
+- Add/adjust tests; run type/lint/tests locally  
+- Justify any new dependency + propose lighter alternative  
+
+**After coding**  
+- Provide concise PR body using checklist  
+- If still failing after 3 tries, generate contextual summary and stop  
+
+## PR Checklist
+- [ ] Minimal diff (≤ ~30 lines unless truly necessary)  
+- [ ] Tests added/updated & pass locally  
+- [ ] Typecheck + lint pass  
+- [ ] No secrets; `.env.example` updated if needed  
+- [ ] Acceptance criteria met  
+- [ ] Rollback plan noted  
+- [ ] Attempt Log updated (if multiple tries)  
+- [ ] `docs/SHIPLOG.md` updated  
+
+
+globs:
+alwaysApply: true
+---

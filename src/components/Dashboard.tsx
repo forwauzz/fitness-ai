@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { getDashboardAnalytics, getGoals, addGoal } from "../lib/api";
+import dayjs from 'dayjs';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -26,6 +27,8 @@ export default function Dashboard() {
   const [error, setError] = useState<string>("");
   const [newGoal, setNewGoal] = useState({ type: "", value: 0, notes: "" });
   const [showGoalForm, setShowGoalForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const [viewMode, setViewMode] = useState<'meals' | 'workouts'>('meals');
 
   useEffect(() => {
     fetchData();
@@ -45,6 +48,16 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getSelectedDayData = () => {
+    if (!dashboardData) return null;
+    return dashboardData.dailyData.find(day => day.date === selectedDate) || null;
+  };
+
+  const getSelectedDayGoals = () => {
+    if (!goals) return [];
+    return goals.filter(goal => goal.date === selectedDate);
   };
 
   const handleAddGoal = async () => {
@@ -168,6 +181,164 @@ export default function Dashboard() {
           <p className="text-blue-200/80 text-lg">
             Advanced Analytics & Goal Tracking
           </p>
+        </div>
+
+        {/* Date Picker and Daily Summary */}
+        <div className="bg-slate-800/30 border border-blue-400/20 rounded-xl p-6 backdrop-blur-sm mb-8">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div>
+                <label className="block text-blue-300 font-semibold mb-2">Select Date</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="bg-slate-700/50 border border-blue-400/30 rounded-lg p-3 text-blue-100 focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+              <div>
+                <label className="block text-blue-300 font-semibold mb-2">View Mode</label>
+                <div className="flex bg-slate-700/50 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('meals')}
+                    className={`px-4 py-2 rounded-md transition-all duration-300 ${
+                      viewMode === 'meals'
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'text-blue-200 hover:text-white'
+                    }`}
+                  >
+                    Meals
+                  </button>
+                  <button
+                    onClick={() => setViewMode('workouts')}
+                    className={`px-4 py-2 rounded-md transition-all duration-300 ${
+                      viewMode === 'workouts'
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'text-blue-200 hover:text-white'
+                    }`}
+                  >
+                    Workouts
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-300">
+                {dayjs(selectedDate).format('MMMM DD, YYYY')}
+              </div>
+              <div className="text-blue-200/70 text-sm">
+                {dayjs(selectedDate).format('dddd')}
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Summary */}
+          {(() => {
+            const dayData = getSelectedDayData();
+            const dayGoals = getSelectedDayGoals();
+            
+            if (!dayData) {
+              return (
+                <div className="text-center py-8">
+                  <div className="text-blue-300/60 text-lg">No data available for this date</div>
+                  <div className="text-blue-300/40 text-sm mt-2">Try selecting a different date</div>
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Meals Summary */}
+                {viewMode === 'meals' && (
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-blue-300 mb-4">🍽️ MEALS SUMMARY</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-blue-900/40 rounded-lg p-4 border border-blue-400/30">
+                        <div className="text-2xl font-bold text-blue-300">{dayData.calories}</div>
+                        <div className="text-blue-200/70 text-sm">Total Calories</div>
+                      </div>
+                      <div className="bg-cyan-900/40 rounded-lg p-4 border border-cyan-400/30">
+                        <div className="text-2xl font-bold text-cyan-300">{dayData.meals}</div>
+                        <div className="text-cyan-200/70 text-sm">Meals Logged</div>
+                      </div>
+                      <div className="bg-green-900/40 rounded-lg p-4 border border-green-400/30">
+                        <div className="text-2xl font-bold text-green-300">{dayData.protein.toFixed(1)}g</div>
+                        <div className="text-green-200/70 text-sm">Protein</div>
+                      </div>
+                      <div className="bg-yellow-900/40 rounded-lg p-4 border border-yellow-400/30">
+                        <div className="text-2xl font-bold text-yellow-300">{dayData.carbs.toFixed(1)}g</div>
+                        <div className="text-yellow-200/70 text-sm">Carbs</div>
+                      </div>
+                      <div className="bg-orange-900/40 rounded-lg p-4 border border-orange-400/30">
+                        <div className="text-2xl font-bold text-orange-300">{dayData.fat.toFixed(1)}g</div>
+                        <div className="text-orange-200/70 text-sm">Fat</div>
+                      </div>
+                      <div className="bg-purple-900/40 rounded-lg p-4 border border-purple-400/30">
+                        <div className="text-2xl font-bold text-purple-300">
+                          {((dayData.protein * 4 + dayData.carbs * 4 + dayData.fat * 9) / dayData.calories * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-purple-200/70 text-sm">Macro Accuracy</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Workouts Summary */}
+                {viewMode === 'workouts' && (
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-blue-300 mb-4">💪 WORKOUTS SUMMARY</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-green-900/40 rounded-lg p-4 border border-green-400/30">
+                        <div className="text-2xl font-bold text-green-300">{dayData.workouts}</div>
+                        <div className="text-green-200/70 text-sm">Workouts</div>
+                      </div>
+                      <div className="bg-cyan-900/40 rounded-lg p-4 border border-cyan-400/30">
+                        <div className="text-2xl font-bold text-cyan-300">{dayData.workoutDuration}</div>
+                        <div className="text-cyan-200/70 text-sm">Minutes</div>
+                      </div>
+                      <div className="bg-blue-900/40 rounded-lg p-4 border border-blue-400/30">
+                        <div className="text-2xl font-bold text-blue-300">{dayData.distance.toFixed(1)}km</div>
+                        <div className="text-blue-200/70 text-sm">Distance</div>
+                      </div>
+                      <div className="bg-purple-900/40 rounded-lg p-4 border border-purple-400/30">
+                        <div className="text-2xl font-bold text-purple-300">
+                          {dayData.workouts > 0 ? (dayData.workoutDuration / dayData.workouts).toFixed(0) : 0}
+                        </div>
+                        <div className="text-purple-200/70 text-sm">Avg Duration</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Goals for Selected Date */}
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold text-blue-300 mb-4">🎯 GOALS FOR THIS DAY</h3>
+                  {dayGoals.length > 0 ? (
+                    <div className="space-y-3">
+                      {dayGoals.map((goal, index) => (
+                        <div key={index} className="bg-slate-700/30 rounded-lg p-4 border border-slate-400/30">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-semibold text-blue-300 capitalize">{goal.goal_type}</h4>
+                              <p className="text-blue-200/70 text-sm">{goal.goal_notes}</p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xl font-bold text-cyan-300">{goal.goal_value}</div>
+                              <div className="text-cyan-200/70 text-xs">Target</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4">
+                      <div className="text-blue-300/60">No goals set for this date</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Today's Summary */}

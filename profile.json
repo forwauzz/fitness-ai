@@ -1,0 +1,48 @@
+{
+  "user_id": "default_user",
+  "created_at": "2025-09-05T21:50:00.730Z",
+  "updated_at": "2025-09-05T22:07:39.000Z",
+  "preferences": {
+    "favorite_foods": [
+      "fried plantain",
+      "Orange pancakes/crepes",
+      "fried ripe plantain"
+    ],
+    "favorite_snacks": [],
+    "grocery_items": [
+      "Basmati Rice",
+      "Plantain chips",
+      "rice crispies",
+      "sweet potatoes",
+      "mango",
+      "chicken breasts",
+      "bacon",
+      "maggi",
+      "salmon",
+      "shrimps",
+      "lean ground beef"
+    ],
+    "dietary_restrictions": [],
+    "meal_timing_preferences": {}
+  },
+  "learning_metrics": {
+    "total_predictions": 18,
+    "accuracy_trend": [
+      0.9778491227089878,
+      0.8745085252892333,
+      0.8745085252892333,
+      0.8745085252892333
+    ],
+    "model_confidence": 0.8745085252892333,
+    "personalization_score": 1.0
+  },
+  "dietary_patterns": {
+    "average_meal_size": {},
+    "meal_frequency": {},
+    "macro_preferences": {
+      "protein_ratio": 0.25,
+      "carbs_ratio": 0.45,
+      "fat_ratio": 0.3
+    }
+  }
+}

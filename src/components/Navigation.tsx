@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 interface NavigationProps {
-  currentView: 'meals' | 'dashboard';
-  onViewChange: (view: 'meals' | 'dashboard') => void;
+  currentView: 'meals' | 'dashboard' | 'profile' | 'ml-training' | 'calendar';
+  onViewChange: (view: 'meals' | 'dashboard' | 'profile' | 'ml-training' | 'calendar') => void;
 }
 
 export default function Navigation({ currentView, onViewChange }: NavigationProps) {
@@ -51,6 +51,54 @@ export default function Navigation({ currentView, onViewChange }: NavigationProp
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 <span>Dashboard</span>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => onViewChange('profile')}
+              className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+                currentView === 'profile'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                  : 'text-blue-200 hover:text-white hover:bg-blue-600/20'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>Profile</span>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => onViewChange('calendar')}
+              className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+                currentView === 'calendar'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                  : 'text-blue-200 hover:text-white hover:bg-blue-600/20'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Calendar</span>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => onViewChange('ml-training')}
+              className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+                currentView === 'ml-training'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                  : 'text-blue-200 hover:text-white hover:bg-blue-600/20'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span>ML Training</span>
               </div>
             </button>
           </div>

@@ -4,11 +4,15 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k \"npm:dev:*\"",
-    "dev:server": "node --loader ts-node/esm server/index.ts",
+    "dev:server": "node server/index.js",
     "dev:client": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "start": "node server/production.js",
+    "start:prod": "NODE_ENV=production node server/production.js",
+    "backup": "node scripts/backup.js",
+    "health": "curl http://localhost:3001/api/health"
   },
   "dependencies": {
     "chart.js": "^4.5.0",

@@ -14,7 +14,7 @@ lunch: 180 g shrimp, 129 g pasta, 1 glass mango juice`
 
   async function fetchDailyTotals() {
     try {
-      const response = await fetch("http://localhost:3001/api/logs");
+      const response = await fetch("http://localhost:3000/api/logs");
       const csvText = await response.text();
       const lines = csvText.split('\n').filter(line => line.trim());
       const today = new Date().toISOString().split('T')[0];

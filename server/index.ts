@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import dayjs from "dayjs";
 import { parseTextToMeals } from "./parser.js";
 
@@ -11,11 +11,44 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.text({ type: ["text/plain", "text/*"], limit: "1mb" }));
 
 const CSV = path.join(process.cwd(), "data.csv");
+const PROFILE_PATH = path.join(process.cwd(), "profile.json");
 
 // Ensure header exists & exact order
 const HEADER = "date,entry_type,meal_type,items,quantities,calories_kcal,protein_g,carbs_g,fat_g,workout_type,duration_min,distance_km,goal_type,goal_value,goal_notes,notes";
 if (!fs.existsSync(CSV)) {
   fs.writeFileSync(CSV, HEADER + "\n", "utf8");
+}
+
+// Ensure profile exists
+if (!fs.existsSync(PROFILE_PATH)) {
+  const defaultProfile = {
+    "user_id": "default_user",
+    "created_at": new Date().toISOString(),
+    "updated_at": new Date().toISOString(),
+    "preferences": {
+      "favorite_foods": [],
+      "favorite_snacks": [],
+      "grocery_items": [],
+      "dietary_restrictions": [],
+      "meal_timing_preferences": {}
+    },
+    "learning_metrics": {
+      "total_predictions": 0,
+      "accuracy_trend": [],
+      "model_confidence": 0.0,
+      "personalization_score": 0.0
+    },
+    "dietary_patterns": {
+      "average_meal_size": {},
+      "meal_frequency": {},
+      "macro_preferences": {
+        "protein_ratio": 0.0,
+        "carbs_ratio": 0.0,
+        "fat_ratio": 0.0
+      }
+    }
+  };
+  fs.writeFileSync(PROFILE_PATH, JSON.stringify(defaultProfile, null, 2), "utf8");
 }
 
 // Simple CSV row escaper
@@ -32,10 +65,10 @@ function appendMealRow(dateISO: string, meal_type: string, items: string[], quan
     meal_type,
     items.join("; "),
     quants.join("; "),
-    Math.round(kcal).toString(),
-    P.toFixed(1),
-    C.toFixed(1),
-    F.toFixed(1),
+    Math.round(kcal),
+    +P.toFixed(1),
+    +C.toFixed(1),
+    +F.toFixed(1),
     "", "", "", "", "", "", ""
   ].map(csvEscape).join(",");
   fs.appendFileSync(CSV, row + "\n", "utf8");
@@ -71,162 +104,51 @@ app.get("/api/logs", (_req, res) => {
   return res.type("text/csv").send(content);
 });
 
-// Dashboard Analytics API
-app.get("/api/dashboard/analytics", (req, res) => {
+// Profile management endpoints
+app.get("/api/profile", (_req, res) => {
   try {
-    const content = fs.readFileSync(CSV, "utf8");
-    const lines = content.split('\n').filter(line => line.trim());
-    const today = dayjs().format("YYYY-MM-DD");
-    const weekAgo = dayjs().subtract(7, 'day').format("YYYY-MM-DD");
-    
-    // Parse CSV data
-    const data = lines.slice(1).map(line => {
-      const cols = line.split(',');
-      return {
-        date: cols[0],
-        entry_type: cols[1],
-        meal_type: cols[2],
-        calories_kcal: parseFloat(cols[5]) || 0,
-        protein_g: parseFloat(cols[6]) || 0,
-        carbs_g: parseFloat(cols[7]) || 0,
-        fat_g: parseFloat(cols[8]) || 0,
-        workout_type: cols[9],
-        duration_min: parseFloat(cols[10]) || 0,
-        distance_km: parseFloat(cols[11]) || 0,
-        goal_type: cols[12],
-        goal_value: parseFloat(cols[13]) || 0,
-        goal_notes: cols[14],
-        notes: cols[15]
-      };
-    }).filter(row => row.date >= weekAgo);
-
-    // Daily aggregations
-    const dailyData = {};
-    data.forEach(row => {
-      if (!dailyData[row.date]) {
-        dailyData[row.date] = {
-          date: row.date,
-          meals: 0,
-          calories: 0,
-          protein: 0,
-          carbs: 0,
-          fat: 0,
-          workouts: 0,
-          workoutDuration: 0,
-          distance: 0,
-          goals: []
-        };
-      }
-      
-      if (row.entry_type === 'meal' && row.calories_kcal > 0) {
-        dailyData[row.date].meals++;
-        dailyData[row.date].calories += row.calories_kcal;
-        dailyData[row.date].protein += row.protein_g;
-        dailyData[row.date].carbs += row.carbs_g;
-        dailyData[row.date].fat += row.fat_g;
-      }
-      
-      if (row.workout_type && row.duration_min > 0) {
-        dailyData[row.date].workouts++;
-        dailyData[row.date].workoutDuration += row.duration_min;
-        dailyData[row.date].distance += row.distance_km;
-      }
-      
-      if (row.goal_type && row.goal_value > 0) {
-        dailyData[row.date].goals.push({
-          type: row.goal_type,
-          value: row.goal_value,
-          notes: row.goal_notes
-        });
-      }
-    });
-
-    // Weekly totals
-    const weeklyTotals = {
-      totalMeals: 0,
-      totalCalories: 0,
-      totalProtein: 0,
-      totalCarbs: 0,
-      totalFat: 0,
-      totalWorkouts: 0,
-      totalWorkoutDuration: 0,
-      totalDistance: 0,
-      activeDays: Object.keys(dailyData).length
-    };
-
-    Object.values(dailyData).forEach((day: any) => {
-      weeklyTotals.totalMeals += day.meals;
-      weeklyTotals.totalCalories += day.calories;
-      weeklyTotals.totalProtein += day.protein;
-      weeklyTotals.totalCarbs += day.carbs;
-      weeklyTotals.totalFat += day.fat;
-      weeklyTotals.totalWorkouts += day.workouts;
-      weeklyTotals.totalWorkoutDuration += day.workoutDuration;
-      weeklyTotals.totalDistance += day.distance;
-    });
-
-    // Today's data
-    const todayData = dailyData[today] || {
-      date: today,
-      meals: 0,
-      calories: 0,
-      protein: 0,
-      carbs: 0,
-      fat: 0,
-      workouts: 0,
-      workoutDuration: 0,
-      distance: 0,
-      goals: []
-    };
-
-    res.json({
-      dailyData: Object.values(dailyData).sort((a: any, b: any) => a.date.localeCompare(b.date)),
-      weeklyTotals,
-      todayData,
-      period: { start: weekAgo, end: today }
-    });
+    const profile = JSON.parse(fs.readFileSync(PROFILE_PATH, "utf8"));
+    return res.json(profile);
   } catch (error) {
-    res.status(500).json({ error: "Failed to generate analytics" });
+    return res.status(500).json({ error: "Failed to load profile" });
   }
 });
 
-// Goals API
-app.get("/api/goals", (req, res) => {
+app.put("/api/profile", (req, res) => {
   try {
-    const content = fs.readFileSync(CSV, "utf8");
-    const lines = content.split('\n').filter(line => line.trim());
-    
-    const goals = lines.slice(1).map(line => {
-      const cols = line.split(',');
-      return {
-        date: cols[0],
-        goal_type: cols[12],
-        goal_value: parseFloat(cols[13]) || 0,
-        goal_notes: cols[14]
-      };
-    }).filter(row => row.goal_type && row.goal_value > 0);
-
-    res.json(goals);
+    const updatedProfile = {
+      ...req.body,
+      updated_at: new Date().toISOString()
+    };
+    fs.writeFileSync(PROFILE_PATH, JSON.stringify(updatedProfile, null, 2), "utf8");
+    return res.json(updatedProfile);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch goals" });
+    return res.status(500).json({ error: "Failed to update profile" });
   }
 });
 
-app.post("/api/goals", (req, res) => {
+app.post("/api/profile/preferences", (req, res) => {
   try {
-    const { goal_type, goal_value, goal_notes } = req.body;
-    const today = dayjs().format("YYYY-MM-DD");
+    const profile = JSON.parse(fs.readFileSync(PROFILE_PATH, "utf8"));
+    const { type, items } = req.body; // type: 'favorite_foods', 'favorite_snacks', 'grocery_items'
     
-    // Add goal to CSV
-    const row = [
-      today, "goal", "", "", "", 0, 0, 0, 0, "", 0, 0, goal_type, goal_value, goal_notes, ""
-    ].map(csvEscape).join(",");
+    if (!profile.preferences[type]) {
+      profile.preferences[type] = [];
+    }
     
-    fs.appendFileSync(CSV, row + "\n", "utf8");
+    // Add new items, avoiding duplicates
+    const newItems = Array.isArray(items) ? items : [items];
+    newItems.forEach((item: string) => {
+      if (!profile.preferences[type].includes(item)) {
+        profile.preferences[type].push(item);
+      }
+    });
     
-    res.json({ success: true, message: "Goal added successfully" });
+    profile.updated_at = new Date().toISOString();
+    fs.writeFileSync(PROFILE_PATH, JSON.stringify(profile, null, 2), "utf8");
+    return res.json(profile);
   } catch (error) {
-    res.status(500).json({ error: "Failed to add goal" });
+    return res.status(500).json({ error: "Failed to update preferences" });
   }
 });
 
