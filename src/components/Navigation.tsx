@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef } from "react";
 
 interface NavigationProps {
   currentView: 'meals' | 'dashboard' | 'profile' | 'ml-training' | 'calendar';
@@ -6,6 +6,13 @@ interface NavigationProps {
 }
 
 export default function Navigation({ currentView, onViewChange }: NavigationProps) {
+  const prefetched = useRef(false);
+
+  function prefetchDashboard() {
+    if (prefetched.current) return;
+    prefetched.current = true;
+    import('./Dashboard');
+  }
   return (
     <nav className="bg-slate-800/50 backdrop-blur-xl border-b border-blue-400/30 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
@@ -40,6 +47,8 @@ export default function Navigation({ currentView, onViewChange }: NavigationProp
             
             <button
               onClick={() => onViewChange('dashboard')}
+              onMouseEnter={prefetchDashboard}
+              onFocus={prefetchDashboard}
               className={`px-4 py-2 rounded-lg transition-all duration-300 ${
                 currentView === 'dashboard'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'

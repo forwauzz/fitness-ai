@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { logMealsText } from "../lib/api";
+import { logMealsText, API_BASE } from "../lib/api";
 
 export default function ChatMealLogger() {
   const [text, setText] = useState<string>(
@@ -14,7 +14,7 @@ lunch: 180 g shrimp, 129 g pasta, 1 glass mango juice`
 
   async function fetchDailyTotals() {
     try {
-      const response = await fetch("http://localhost:3000/api/logs");
+      const response = await fetch(`${API_BASE}/api/logs`);
       const csvText = await response.text();
       const lines = csvText.split('\n').filter(line => line.trim());
       const today = new Date().toISOString().split('T')[0];
